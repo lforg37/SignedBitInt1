@@ -1,0 +1,48 @@
+\documentclass[a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{filecontents}
+
+\begin{filecontents*}[overwrite]{biblio.bib}
+@inproceedings{kummMult,
+author = {Kumm, Martin and Kappauf, Johannes and Istoan, Matei and Zipf, P.},
+year = {2017},
+month = {07},
+pages = {131-138},
+title = {Resource Optimal Design of Large Multipliers for FPGAs},
+doi = {10.1109/ARITH.2017.35}
+}
+\end{filecontents*}
+
+
+\usepackage[backend=biber]{biblatex}
+\addbibresource{biblio.bib}
+
+\title{Rational for a  \texttt{signed \_BitInt(1)}}
+\author{}
+\begin{document}
+    \maketitle
+
+    \begin{abstract}
+        This paper proposes to allow \texttt{signed \_BitInt(1)} using the standard 2's complement interpretation of its values.
+        It gives one example of an application which can benefit from such a type.
+    \end{abstract}
+
+    \tableofcontents
+    \section{Proposed semantics}
+    Based on two's complement, a \texttt{signed \_BitInt(1)} represents the integer -1 when its bit is set, the integer 0 otherwise. 
+
+    \section{Application Example: custom tiled multiplier}
+    Tiled multipliers is a way to split the computation of a wide integers product into a sum of smaller products.
+    Tiled multipliers can for instance be used to build larger products out of the DSP availables on an FPGA.
+    A wide variety of tiling allows different trade-offs between logic and DSP consumption.
+    Kumm, Kappauf, Istoan and Zipf have provided a paper that give some optimal tiling for a given DSP shape and under a maximal DSP constraint for various square products \cite{kummMult}.
+    On figure 6.o of their paper, the leftmost wide vertical tile is a product between the 64 bits of the first input and the most signicant bit of the second input.
+    If the original product is computed between two signed integer, the msb of the second input is its sign bit, and the output of the tile is either zero if this bit is null, or negated if it is set.
+    The considered sub product can be represented as a product between two variables of type \texttt{signed \_BitInt(64)} and \texttt{signed \_BitInt(1)} respectively.
+    Not having this type would require relying on some condition variable or using some hack with a \texttt{signed \_BitInt(2)} that will obfuscate the code intent.
+
+   
+\printbibliography
+    \end{document}
